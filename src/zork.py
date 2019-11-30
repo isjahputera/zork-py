@@ -208,30 +208,50 @@ def Play_Zork():
 			if exit_inp.lower() == ("y"):
 				Play_Zork()
 
-def Play_Zork():
+def Play_Zork_Refactored():
 	loop = 0
+	user_is_alive = True
 	while True:
 		if loop == 0:
 			loop = 4
 			print("---------------------------------------------------------")
 			print("Welcome to Zork - The Unofficial Python Version.")
-
+			if not user_is_alive:
+				print("Dead user has been resurrected! :)")
+				user_is_alive = True
 		if loop == 4:
-			loop = south()
+			loop, user_is_alive = south()
 
-		if loop == 1:
-			loop = north()
+		elif loop == 1:
+			loop, user_is_alive = north()
 
-		if loop == 8:
-			loop = southwest()
+		elif loop == 8:
+			loop, user_is_alive = southwest()
 
-		if loop == -1:
+		elif loop == 9:
+			loop, user_is_alive = east()
+
+		elif loop == 10:
+			loop, user_is_alive = cave()
+
+		elif loop == 11:
+			loop, user_is_alive = treasure()
+
+		elif loop == -1:
 			break
+
+		if user_is_alive:
+			print("User is alive and well. :)")
+		else:
+			print("User has kicked the bucket. :(")
+
 	exit()
 
 def south():
 	# First Input Loop
 	return_value = 0
+	user_is_alive = True
+	mailbox_is_open = False
 	while True:
 		print("---------------------------------------------------------")
 		print("You are standing in an open field west of a white house, with a boarded front door.")
@@ -246,6 +266,7 @@ def south():
 		elif second.lower() == ("open mailbox"):
 			print("---------------------------------------------------------")
 			print("Opening the small mailbox reveals a leaflet.")
+			mailbox_is_open = True
 		elif second.lower() == ("go north"):
 			return_value = 1
 			break
@@ -264,10 +285,14 @@ def south():
 			break
 		elif second.lower() == ("read leaflet"):
 			print("---------------------------------------------------------")
-			print("Welcome to the Unofficial Python Version of Zork. Your mission is to find a Jade Statue.")
+			if mailbox_is_open:
+				print("Welcome to the Unofficial Python Version of Zork. Your mission is to find a Jade Statue.")
+			else:
+				print("You have to open the mailbox first before you can read the leaflet inside the mailbox.")
 		elif second.lower() == ("kick the bucket"):
 			print("---------------------------------------------------------")
 			print("You die.")
+			user_is_alive = False
 			print("---------------------------------------------------------")
 			dead_inp = input("Do you want to continue? Y/N ")
 			if dead_inp.lower() == ("n"):
@@ -277,11 +302,12 @@ def south():
 			break
 		else:
 			print("---------------------------------------------------------")
-	return return_value
+	return return_value, user_is_alive
 
 def north():
 	# North of House
 	return_value = 0
+	user_is_alive = True
 	while True:
 		print("---------------------------------------------------------")
 		print("You find yourself at the edge of a beautiful lake aside rolling hills.")
@@ -302,6 +328,7 @@ def north():
 		elif north_house_inp.lower() == ("kick the bucket"):
 			print("---------------------------------------------------------")
 			print("You die.")
+			user_is_alive = False
 			print("---------------------------------------------------------")
 			dead_inp = input("Do you want to continue? Y/N ")
 			if dead_inp.lower() == ("n"):
@@ -311,10 +338,11 @@ def north():
 			break
 		else:
 			print("---------------------------------------------------------")
-	return return_value
+	return return_value, user_is_alive
 
 def southwest():
 	return_value = 0
+	user_is_alive = True
 	while True:
 		print("---------------------------------------------------------")
 		print("This is a forest, with trees in all directions. To the east, there appears to be sunlight.")
@@ -335,6 +363,89 @@ def southwest():
 		elif forest_inp.lower() == ("kick the bucket"):
 			print("---------------------------------------------------------")
 			print("You die.")
+			user_is_alive = False
+			print("---------------------------------------------------------")
+			dead_inp = input("Do you want to continue? Y/N ")
+			if dead_inp.lower() == ("n"):
+				return_value = -1
+			if dead_inp.lower() == ("y"):
+				return_value = 0
+			break
+		else:
+			print("---------------------------------------------------------")
+	return return_value, user_is_alive
+
+def east():
+	# East Loop and Grating Input
+	return_value = 0
+	user_is_alive = True
+	while True:
+		print("---------------------------------------------------------")
+		print("You are in a clearing, with a forest surrounding you on all sides. A path leads south.")
+		print("There is an open grating, descending into darkness.")
+		grating_inp = input("What do you do? ")
+
+		if grating_inp.lower() == ("go south"):
+			print("---------------------------------------------------------")
+			print("You see a large ogre and turn around.")
+		elif grating_inp.lower() == ("descend grating"):
+			return_value = 10
+			break
+		elif grating_inp.lower() == ("kick the bucket"):
+			print("---------------------------------------------------------")
+			print("You die.")
+			user_is_alive = False
+			print("---------------------------------------------------------")
+			dead_inp = input("Do you want to continue? Y/N ")
+			if dead_inp.lower() == ("n"):
+				return_value = -1
+			if dead_inp.lower() == ("y"):
+				return_value = 0
+			break
+		else:
+			print("---------------------------------------------------------")
+	return return_value, user_is_alive
+
+def cave():
+	# Grating Loop and Cave Input
+	return_value = 0
+	user_is_alive = True
+	while True:
+		print("---------------------------------------------------------")
+		print("You are in a tiny cave with a dark, forbidding staircase leading down and another staircase going up.")
+		print("There is a skeleton of a human male in one corner.")
+		cave_inp = input("What do you do? ")
+
+		if cave_inp.lower() in ["descend staircase", "go down staircase", "scale staircase"]:
+			return_value = 11
+			break
+		elif cave_inp.lower() in ["ascend staircase", "go up staircase", "climb staircase"]:
+			print("---------------------------------------------------------")
+			print("OMG. You have unfortunately climbed up into a dark space where a Grue lives.")
+			print("The Grue has eaten you alive!")
+			user_is_alive = False
+			dead_inp = input("Do you want to continue? Y/N ")
+			if dead_inp.lower() == ("n"):
+				return_value = -1
+			if dead_inp.lower() == ("y"):
+				return_value = 0
+			break
+		elif cave_inp.lower() == ("take skeleton"):
+			print("---------------------------------------------------------")
+			print("Why would you do that? Are you some sort of sicko?")
+		elif cave_inp.lower() == ("smash skeleton"):
+			print("---------------------------------------------------------")
+			print("Sick person. Have some respect mate.")
+		elif cave_inp.lower() == ("light up room"):
+			print("---------------------------------------------------------")
+			print("You would need a torch or lamp to do that.")
+		elif cave_inp.lower() == ("break skeleton"):
+			print("---------------------------------------------------------")
+			print("I have two questions: Why and With What?")
+		elif cave_inp.lower() == ("kick the bucket"):
+			print("---------------------------------------------------------")
+			print("You die.")
+			user_is_alive = False
 			print("---------------------------------------------------------")
 			dead_inp = input("Do you want to continue? Y/N ")
 			if dead_inp.lower() == ("n"):
@@ -345,29 +456,41 @@ def southwest():
 		else:
 			print("---------------------------------------------------------")
 
-def east():
-	# East Loop and Grating Input
-	
-	while loop == 9:
-		if loop == 9:
-			print("---------------------------------------------------------")
-			print("You are in a clearing, with a forest surrounding you on all sides. A path leads south.")
-			print("There is an open grating, descending into darkness.")
-			grating_inp = input("What do you do? ")
+	return return_value, user_is_alive
 
-		if grating_inp.lower() == ("go south"):
+def treasure():
+	# End of game
+	return_value = 0
+	user_is_alive = True
+	while True:
+		print("---------------------------------------------------------")
+		print("You have entered a mud-floored room.")
+		print("Lying half buried in the mud is an old trunk, bulging with jewels.")
+		last_inp = input("What do you do? ")
+
+		if last_inp.lower() == ("open trunk"):
 			print("---------------------------------------------------------")
-			print("You see a large ogre and turn around.")
-		elif grating_inp.lower() == ("descend grating"):
-			loop = 10
-		elif grating_inp.lower() == ("kick the bucket"):
+			print("You have found the Jade Statue and have completed your quest!")
+			break
+		elif last_inp.lower() == ("kick the bucket"):
 			print("---------------------------------------------------------")
 			print("You die.")
+			user_is_alive = False
 			print("---------------------------------------------------------")
 			dead_inp = input("Do you want to continue? Y/N ")
 			if dead_inp.lower() == ("n"):
-				exit()
+				return_value = -1
 			if dead_inp.lower() == ("y"):
-				Play_Zork()
+				return_value = 0
+			break
 		else:
 			print("---------------------------------------------------------")
+
+	# Exit loop at the end of game
+	exit_inp = input("Do you want to continue? Y/N ")
+	if exit_inp.lower() == ("n"):
+		return_value = -1
+	if exit_inp.lower() == ("y"):
+		return_value = 0
+
+	return return_value, user_is_alive
